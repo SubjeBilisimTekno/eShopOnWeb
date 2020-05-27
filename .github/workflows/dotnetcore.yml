@@ -52,9 +52,9 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN_ESHOP }}
       with:
-        #command: monitor
-        #args: --severity-threshold=high
-        args: --file=eShopOnWeb.sln
+        command: monitor
+        args: --severity-threshold=high
+        #args: --file=eShopOnWeb.sln
     - name: Slack Notification for Snyk
       if: steps.unitslack.outputs.JOB_STATUS_UNIT != 'failed' && failure()
       uses: bryan-nice/slack-notification@master
