@@ -67,20 +67,20 @@ jobs:
     # test
     - uses: azure/docker-login@v1 
       with:
-        login-server: subjerepo.azurecr.io
+        login-server: subjedotnet.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME_SUBJE }} 
         password: ${{ secrets.REGISTRY_PASSWORD_SUBJE }}
     # Docker build and push to a Azure Container registry (ACR)
     - run: |
-       docker build . -t subjerepo.azurecr.io/dotnetdemo:${{ github.run_id }}
-       docker push subjerepo.azurecr.io/dotnetdemo:${{ github.run_id }}
+       docker build . -t subjedotnet.azurecr.io/dotnetdemo:${{ github.run_id }}
+       docker push subjedotnet.azurecr.io/dotnetdemo:${{ github.run_id }}
     # Set the target AKS cluster.
     - name: Slack Notification for Build
       uses: bryan-nice/slack-notification@master
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_SUBJE }}
         SLACK_TITLE: 'Build'
-        SLACK_MESSAGE: 'Your build is completed! successfully pushed to repo subjerepo.azurecr.io/dotnetdemo:${{ github.run_id }}'
+        SLACK_MESSAGE: 'Your build is completed! successfully pushed to repo subjedotnet.azurecr.io/dotnetdemo:${{ github.run_id }}'
   staging:
     # deploy to AKS
     if: github.run_id != 'refs/heads/master' &&  github.event_name == 'push'
@@ -97,22 +97,22 @@ jobs:
     # Create imagepullsecret for Azure Container registry (ACR)
     - uses: azure/k8s-create-secret@v1 
       with:
-        container-registry-url: subjerepo.azurecr.io
+        container-registry-url: subjedotnet.azurecr.io
         container-registry-username: ${{ secrets.REGISTRY_USERNAME_SUBJE }} 
         container-registry-password: ${{ secrets.REGISTRY_PASSWORD_SUBJE }}
         secret-name: acr-secret
-        namespace: dotnetprojectdemo
+        namespace: dotnetappdemo
     # Deploy app to AKS
-    #- uses: azure/k8s-deploy@v1 
-      #with:
-        #namespace: dotnetprojectdemo
-        #manifests: |
-          #kubernetes/demodeployment.yaml
-        #images: |
-          #subjerepo.azurecr.io/dotnetdemo:${{ github.run_id }} 
-        #imagepullsecrets: |
-          #acr-secret
-          #namespace: dotnetprojectdemo
+    - uses: azure/k8s-deploy@v1 
+      with:
+        namespace: dotnetappdemo
+        manifests: |
+          kubernetes/dotnetdeploy.yaml
+        images: |
+          subjedotnet.azurecr.io/dotnetdemo:${{ github.run_id }} 
+        imagepullsecrets: |
+          acr-secret
+          namespace: dotnetappdemo
     ## generating report and pull request
     - name: Slack Notification for Failure
       uses: bryan-nice/slack-notification@master
@@ -163,22 +163,22 @@ jobs:
     # Create imagepullsecret for Azure Container registry (ACR)
     - uses: azure/k8s-create-secret@v1 
       with:
-        container-registry-url: subjerepo.azurecr.io
+        container-registry-url: subjedotnet.azurecr.io
         container-registry-username: ${{ secrets.REGISTRY_USERNAME_SUBJE }} 
         container-registry-password: ${{ secrets.REGISTRY_PASSWORD_SUBJE }}
         secret-name: acr-secret
-        namespace: dotnetprojectdemo
+        namespace: dotnetappdemo
     # Deploy app to AKS
-    #- uses: azure/k8s-deploy@v1 
-      #with:
-        #namespace: dotnetprojectdemo
-        #manifests: |
-          #kubernetes/demodeployment.yaml
-        #images: |
-          #subjerepo.azurecr.io/dotnetdemo:${{ github.run_id }} 
-        #imagepullsecrets: |
-          #acr-secret
-          #namespace: dotnetprojectdemo    
+    - uses: azure/k8s-deploy@v1 
+      with:
+        namespace: dotnetappdemo
+        manifests: |
+          kubernetes/dotnetdeploy.yaml
+        images: |
+          subjedotnet.azurecr.io/dotnetdemo:${{ github.run_id }} 
+        imagepullsecrets: |
+          acr-secret
+          namespace: dotnetappdemo    
     - name: Slack Notification for Failure
       uses: bryan-nice/slack-notification@master
       env:

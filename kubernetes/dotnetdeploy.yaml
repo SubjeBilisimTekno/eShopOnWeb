@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnetservice
+  namespace: dotnetappdemo
+  labels: 
+    name: dotnetservice
+spec: 
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+  selector:
+    name: dotnetapp
+---
+apiVersion: app/v1beta1
+kind: Deployment
+metadata: 
+  name: dotnetdeploy
+  namespace: dotnetappdemo
+  labels: 
+    name: dotnetdeploy
+spec: 
+  replicas: 2
+  template: 
+    metadata:
+      labels: 
+        name: dotnetdeploy
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+      - image: subjerepo.azurecr.io/k8sdemo:${{ github.run_id }} 
+        name: dotnet-container
+        resources: 
+          requests:
+            cpu: "20m"
+            memory: "55Mi"
+        ports:
+        - containerPort: 3000
+          name: dotnetdeploy
+        imagePullPolicy: Always
+      restartPolicy: Always
