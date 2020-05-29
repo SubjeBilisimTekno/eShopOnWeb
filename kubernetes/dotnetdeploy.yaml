@@ -22,7 +22,7 @@ metadata:
   labels: 
     name: dotnetdeploy
 spec: 
-  replicas: 2
+  replicas: 1
   template: 
     metadata:
       labels: 
@@ -33,10 +33,10 @@ spec:
       containers:
       - image: subjerepo.azurecr.io/k8sdemo:${{ github.run_id }} 
         name: dotnet-container
-        resources: 
-          requests:
-            cpu: "20m"
-            memory: "55Mi"
+        #resources: 
+          #requests:
+            #cpu: "20m"
+            #memory: "55Mi"
         ports:
         - containerPort: 3000
           name: dotnetdeploy
